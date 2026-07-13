@@ -93,3 +93,39 @@ sold["PropertyType"].astype("string").str.strip().str.lower() == "residential"
 ```
 
 This handles small formatting differences such as extra spaces or capitalization.
+
+# IDX Exchange MLS Market Analysis — Week 3
+
+`mortgage_rate_enrichment.py` completes the mortgage-rate enrichment portion of
+the Weeks 2–3 deliverable. It:
+
+- downloads the FRED `MORTGAGE30US` weekly series
+- calculates the average 30-year fixed mortgage rate for each month
+- merges rates into sold records using `CloseDate`
+- merges rates into listing records using `ListingContractDate`
+- stops without saving enriched datasets if any row has no matching rate
+
+## Run with the existing project data
+
+From this folder:
+
+```bash
+python mortgage_rate_enrichment.py --csv-dir /Users/jack/Desktop/IDX-Exchange/csv
+```
+
+The script reads the Week 1 combined Residential datasets and saves these files
+in `csv/combined_outputs`:
+
+```text
+week3_monthly_mortgage_rates.csv
+CRMLSSold_residential_with_mortgage_rates.csv
+CRMLSListing_residential_with_mortgage_rates.csv
+```
+
+The two enriched datasets contain these added fields:
+
+- `year_month`: monthly join key derived from the appropriate MLS date
+- `rate_30yr_fixed`: monthly average national 30-year fixed mortgage rate
+
+The internet connection must be active when the script runs because the latest
+rate history is downloaded directly from FRED.
