@@ -129,3 +129,26 @@ The two enriched datasets contain these added fields:
 
 The internet connection must be active when the script runs because the latest
 rate history is downloaded directly from FRED.
+
+## Weeks 4–5: Data Cleaning
+
+`data_cleaning.py` converts the required date and numeric fields, removes rows
+with invalid numeric values, and adds timeline and coordinate-quality flags.
+Missing values are retained as nulls so valid transactions are not discarded;
+the dtype summary documents their counts.
+
+Run:
+
+```bash
+python data_cleaning.py
+```
+
+The main deliverable is saved as:
+
+```text
+csv/combined_outputs/CRMLSSold_residential_week4_5_cleaned.csv
+```
+
+Supporting validation outputs are `week4_5_cleaning_summary.csv`,
+`week4_5_dtype_summary.csv`, `week4_5_date_consistency_summary.csv`, and
+`week4_5_geographic_quality_summary.csv`.
