@@ -5,8 +5,8 @@ import pandas as pd
 
 
 FRED_URL = "https://fred.stlouisfed.org/graph/fredgraph.csv?id=MORTGAGE30US"
-LISTING_FILE = "CRMLSListing_combined_202401_to_202605_Residential.csv"
-SOLD_FILE = "CRMLSSold_combined_202401_to_202605_Residential.csv"
+LISTING_FILE = "CRMLSListing_combined_202401_to_202606_Residential.csv"
+SOLD_FILE = "CRMLSSold_combined_202401_to_202606_Residential.csv"
 
 
 def get_monthly_rates():
@@ -28,31 +28,50 @@ def get_monthly_rates():
 
 
 def add_rates(input_path, date_column, monthly_rates, output_path):
-    """Merge monthly mortgage rates into one MLS dataset and save the result."""
-    data = pd.read_csv(input_path, low_memory=False)
-    data[date_column] = pd.to_datetime(data[date_column], errors="coerce")
-    data["year_month"] = data[date_column].dt.to_period("M")
-    enriched = data.merge(monthly_rates, on="year_month", how="left")
+    """Merge rates in chunks so large MLS files do not exhaust memory."""
+    temp_path = output_path.with_suffix(".tmp.csv")
+    total_rows = 0
+    missing_dates = 0
+    missing_rates = 0
+    missing_months = {}
 
-    missing_dates = enriched[date_column].isna().sum()
-    missing_rates = enriched["rate_30yr_fixed"].isna().sum()
+    for chunk_number, data in enumerate(
+        pd.read_csv(input_path, low_memory=False, chunksize=100_000)
+    ):
+        data[date_column] = pd.to_datetime(data[date_column], errors="coerce")
+        data["year_month"] = data[date_column].dt.to_period("M")
+        enriched = data.merge(monthly_rates, on="year_month", how="left")
+
+        total_rows += len(enriched)
+        missing_dates += int(enriched[date_column].isna().sum())
+        rate_is_missing = enriched["rate_30yr_fixed"].isna()
+        missing_rates += int(rate_is_missing.sum())
+
+        for month, count in enriched.loc[rate_is_missing, "year_month"].value_counts(
+            dropna=False
+        ).items():
+            missing_months[str(month)] = missing_months.get(str(month), 0) + int(count)
+
+        enriched.to_csv(
+            temp_path,
+            index=False,
+            mode="w" if chunk_number == 0 else "a",
+            header=chunk_number == 0,
+        )
 
     print(f"\n{input_path.name}")
-    print(f"Rows: {len(enriched):,}")
+    print(f"Rows: {total_rows:,}")
     print(f"Missing or invalid {date_column} values: {missing_dates:,}")
     print(f"Rows without a matching mortgage rate: {missing_rates:,}")
 
     if missing_rates:
-        missing_months = (
-            enriched.loc[enriched["rate_30yr_fixed"].isna(), "year_month"]
-            .value_counts(dropna=False)
-            .sort_index()
-        )
         print("Unmatched months:")
-        print(missing_months.to_string())
+        for month, count in sorted(missing_months.items()):
+            print(f"{month}: {count:,}")
+        temp_path.unlink(missing_ok=True)
         raise ValueError("Mortgage-rate merge has unmatched rows; output was not saved.")
 
-    enriched.to_csv(output_path, index=False)
+    temp_path.replace(output_path)
     print(f"Saved: {output_path}")
 
 

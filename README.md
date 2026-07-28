@@ -21,7 +21,7 @@ IDX-Exchange/
 
 ### `monthly_dataset_aggregation.py`
 
-Combines monthly MLS listing and sold CSV files from January 2024 through May 2026.
+Combines monthly MLS listing and sold CSV files from January 2024 through June 2026.
 
 Main tasks:
 
@@ -72,8 +72,8 @@ csv/combined_outputs/
 Key outputs include:
 
 ```text
-CRMLSListing_combined_202401_to_202605_Residential.csv
-CRMLSSold_combined_202401_to_202605_Residential.csv
+CRMLSListing_combined_202401_to_202606_Residential.csv
+CRMLSSold_combined_202401_to_202606_Residential.csv
 week1_aggregation_row_counts.csv
 week2_3_unique_property_types.csv
 week2_3_filtering_summary.csv
