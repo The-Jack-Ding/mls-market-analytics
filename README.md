@@ -10,10 +10,13 @@ IDX-Exchange/
 │   ├── CRMLSListingYYYYMM.csv
 │   ├── CRMLSSoldYYYYMM.csv
 │   ├── CRMLSSoldYYYYMM_filled.csv
+│   ├── reference_data/
+│   │   └── California_School_District_Areas_2025_26.geojson
 │   └── combined_outputs/
 └── mls-market-analytics/
     ├── monthly_dataset_aggregation.py
     ├── validation.py
+    ├── feature_engineering.py
     └── README.md
 ```
 
@@ -152,3 +155,30 @@ csv/combined_outputs/CRMLSSold_residential_week4_5_cleaned.csv
 Supporting validation outputs are `week4_5_cleaning_summary.csv`,
 `week4_5_dtype_summary.csv`, `week4_5_date_consistency_summary.csv`, and
 `week4_5_geographic_quality_summary.csv`.
+
+## Week 6: Feature Engineering and Market Metrics
+
+`feature_engineering.py` completes the Week 6 deliverable. It creates the
+required price, time-series, and transaction-timeline metrics; assigns valid
+property coordinates to 2025–26 Unified School District polygons; and produces
+a fully populated sample plus a county-level segmented summary.
+
+Run from `mls-market-analytics/`:
+
+```bash
+python feature_engineering.py
+```
+
+The script reads the cleaned Weeks 4–5 dataset, loads the official California
+School District Areas 2025–26 GeoJSON from `csv/reference_data`, and saves these
+files in `csv/combined_outputs`:
+
+```text
+CRMLSSold_residential_week6_enriched.csv
+week6_sample_output.csv
+week6_segment_summary_by_CountyOrParish.csv
+week6_metric_quality_summary.csv
+week6_school_district_mapping_summary.csv
+```
+
+The enriched Week 6 CSV is the input for Week 7 and later project work.
