@@ -182,3 +182,25 @@ week6_school_district_mapping_summary.csv
 ```
 
 The enriched Week 6 CSV is the input for Week 7 and later project work.
+
+## Week 7: Outlier Detection and Data Quality
+
+`outlier_detection.py` applies the handbook's 1.5 x IQR rule independently to
+`ClosePrice`, `LivingArea`, and `DaysOnMarket`. It preserves all records in a
+flagged dataset and creates a separate analysis dataset excluding rows flagged
+in any of the three fields.
+
+Run from `mls-market-analytics/`:
+
+```bash
+python outlier_detection.py
+```
+
+Outputs are saved in `csv/combined_outputs`:
+
+```text
+CRMLSSold_residential_week7_flagged.csv
+CRMLSSold_residential_week7_filtered.csv
+week7_iqr_thresholds.csv
+week7_before_after_comparison.csv
+```
